@@ -58,7 +58,7 @@ class GetAvlDevicesData
     private function getGeofenceData()
     {
 
-		$collection2 = $this->db->geofence;
+		$collection2 = $this->db->geoFences;
 		$cursor2 = $collection2->find(array(), array('projection' => array('_id' => 1, 'attributes.ArabicName' => 1, 'attributes.EnglishName' => 1, 'attributes.Geofence_Type' => 1, 'attributes.Season' => 1, 'attributes.Description' => 1, 'attributes.Code_ID' => 1)))->toArray();
 		$this->geofence_data = $cursor2;
 		//print_r($cursor2);
