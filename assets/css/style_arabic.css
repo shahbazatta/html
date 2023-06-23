@@ -1,0 +1,83 @@
+body{
+    font-family: 'Noto Kufi Arabic', sans-serif !important;
+}
+input, textarea { 
+ direction: rtl;
+}
+
+.loginBox .loginForm .formRow>input.text {
+	font-family: 'Noto Kufi Arabic', sans-serif !important;
+	text-align: right;
+}
+.loginBox .loginForm .buttonRow>button.signInBtn, .applySettingBtn {
+	font-family: 'Noto Kufi Arabic', sans-serif !important;
+}
+
+.loginBox .loginForm .formRow>input.text:-moz-placeholder { text-align: right; }
+.loginBox .loginForm .formRow>input.text:-ms-input-placeholder { text-align: right; }
+.loginBox .loginForm .formRow>input.text::-webkit-input-placeholder { text-align: right; }
+
+
+.cCheckBox2 {float: right;}
+.cCheckBox2>input {right: 0;}
+.checkmark {right: 0;}
+.mainListRows .listRow .lebelText { padding: 0px 0px 0px 0px; float: right; }
+.mainListRows .listRow .lebelText>img { right: 0px;}
+.searchBoxForMenu>input.search {float: right}
+.searchBoxForMenu>button.searchButton {right: auto; left: 0px;}
+.headerList div.close { right:auto; left: 5px; }
+table.tableNeo tbody tr td:first-child, table.tableNeo thead tr th { text-align: right; }
+table.tablesorter thead tr .header { background-position: center left 20px; }
+.selectParent>h3 { left: auto; right: 46px; font-family: 'Noto Kufi Arabic', sans-serif !important;}
+.selectParent>img { left: auto; right: 8px; }
+.bgSelect { 
+	padding: 12px 45px 0px 0px; 
+	background: transparent url(../images/icons/left_actionable.png) center left no-repeat; 
+}
+.mapPoint .pointSv { float: right; }
+.mapPoint .pointSv>img.tick { right:auto; left: 4px; }
+#slider-value { float: left; margin: 0px 0px 0px 10px; }
+.boxPopUpTab .close {
+    right: auto;
+    left: 10px;
+}
+.boxBody table tr td {
+	text-align: right;
+}
+.boxFooter button { float: right; font-family: 'Noto Kufi Arabic' !important;}
+.boxFooter button.delete, .boxFooter button.edit { float: left; font-family: 'Noto Kufi Arabic' !important;}
+.boxFooter button.edit { margin: 0px 0px 0px 10px; }
+
+.boxBody table tr td span {
+    text-align: right;
+}
+.boxFooter button.edit, .boxFooter button.save, .boxFooter button.yes {
+    float: left;
+    margin-left: 10px;
+    margin-right: 0px;
+}
+.boxFooter button.delete, .boxFooter button.no {
+    float: left;
+}
+
+.notification {
+    padding: 10px 20px 10px 44px;
+}
+.notification .nClose {
+    top: 7px;
+    left: 7px;
+    right: auto;
+}
+
+.loadingData{
+    right: 100px;
+    left: auto;
+}
+.loadingData>div{
+    background-position: right 5px center;
+    padding: 10px 48px 10px 20px;
+    text-align: right;
+}
+.bgSelect2, .bgSelect2 option{
+    font-family: 'Noto Kufi Arabic' !important;
+}
