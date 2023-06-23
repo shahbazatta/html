@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 
 	$db = $client->selectDatabase(DB_NAME);
-	$collection = $db->geofence;
+	$collection = $db->geoFences;
 
 	$document = array( 
 	  "attributes" => array(

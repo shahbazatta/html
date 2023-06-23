@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 	$db = $client->selectDatabase(DB_NAME);
-	$collection = $db->geofence;
+	$collection = $db->geoFences;
 
 	$updateResult = $collection->updateOne(
 	   ['_id' => new \MongoDB\BSON\ObjectID($geofence_id)],

@@ -28,7 +28,7 @@ if(isset($_POST["api_key"]) && trim($_POST["api_key"])) {
 		}
 
 		$db = $client->selectDatabase(DB_NAME);
-		$collection = $db->geofence;
+		$collection = $db->geoFences;
 
 		$cursor = $collection->find();
 		$json_data = null;
