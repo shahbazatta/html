@@ -30,9 +30,7 @@ class GetAvlDevicesData
 
     private function connectDbB()
     {
-    	//Atlas connection string
-		//$uri = 'mongodb://shahbaz:Islam786ian@64.227.118.83:27017/';
-
+    	
 		// Create a new client and connect to the server
 		$client = new \MongoDB\Client(DB_SERVER_URL);
 		//$client = new \MongoDB\Client(CONNECTION_STRING );
@@ -58,7 +56,7 @@ class GetAvlDevicesData
     private function getGeofenceData()
     {
 
-		$collection2 = $this->db->geoFences;
+		$collection2 = $this->db->geofence;
 		$cursor2 = $collection2->find(array(), array('projection' => array('_id' => 1, 'attributes.ArabicName' => 1, 'attributes.EnglishName' => 1, 'attributes.Geofence_Type' => 1, 'attributes.Season' => 1, 'attributes.Description' => 1, 'attributes.Code_ID' => 1)))->toArray();
 		$this->geofence_data = $cursor2;
 		//print_r($cursor2);

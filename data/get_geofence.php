@@ -11,10 +11,7 @@ if(isset($_POST["api_key"]) && trim($_POST["api_key"])) {
 	    echo '{"Error":"Invalid api key"}';
 	}
 	else{
-
-		//Atlas connection string
-		//$uri = 'mongodb://shahbaz:Islam786ian@64.227.118.83:27017/';
-
+	
 		// Create a new client and connect to the server
 		$client = new \MongoDB\Client(DB_SERVER_URL);
 		//$client = new \MongoDB\Client(CONNECTION_STRING );
@@ -28,7 +25,7 @@ if(isset($_POST["api_key"]) && trim($_POST["api_key"])) {
 		}
 
 		$db = $client->selectDatabase(DB_NAME);
-		$collection = $db->geoFences;
+		$collection = $db->geofence;
 
 		$cursor = $collection->find();
 		$json_data = null;
