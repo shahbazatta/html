@@ -241,6 +241,99 @@ function addBusFeatures(dataArr) {
   //Hide loading bus data message
   $('#loadingBusData').hide();
 }
+var blink = true;
+function addAnimateFeatures(dataArr) {
+  var featuresArr = [];
+  busesDataFilterReference = [];
+  busesData = dataArr;
+  showBusCounter(busesData.length, "14120");
+  // var image_path = styles.geoMarker;//document.getElementsByClassName("pointSv active")[0].children[1].getAttribute('src');
+  for (let i = 0; i < dataArr.length; i++) {
+    var obj = dataArr[i];
+    var feature = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat(obj.location.coordinates)),
+      properties: obj
+    });
+    feature.setId(obj.imei);
+    feature.setProperties(obj);
+    var iconStyle = styles.geoMarker;
+    // new ol.style.Style({
+    //   image: new ol.style.Icon({
+    //     src: image_path, // Replace with the path to your bus icon image
+    //     scale: 0.60, // Adjust the scale as needed
+    //     //opacity: 0.23
+
+    //     opacity: parseFloat(document.getElementById("slider-value").value)
+
+    //   })
+    // });
+
+    // Set the icon style for the feature
+    feature.setStyle(iconStyle);
+    featuresArr.push(feature);
+  }
+  if (busesDataSource != undefined) {
+    busesDataSource.clear();
+  }
+
+  busesDataSource = new ol.source
+    .Vector({
+      features: featuresArr
+    });
+  // Create a cluster source with a distance of 40 pixels
+  clusterSource = new ol.source.Cluster({
+    distance: 50,
+    source: busesDataSource
+  });
+
+  clusterLayer = new ol.layer.Vector({
+    source: clusterSource,
+    style: function (feature) {
+      var size = feature.get('features').length;
+      var style = new ol.style.Style({
+        image: styles.geoMarker,
+        text: new ol.style.Text({
+          text: size.toString(),
+          fill: new ol.style.Fill({
+            color: '#FFFFFF'
+          })
+        })
+      });
+      return style;
+    }
+  });
+  clusterLayer.setZIndex(5);
+
+  // Add the cluster layer to the map
+  map.addLayer(clusterLayer);
+  blink = !blink;
+
+  var selectedStyle;
+  if (blink)
+    selectedStyle = styles.geoMarker;
+  else
+    selectedStyle = styles.icon;
+  clusterAnimateLayer = new ol.layer.AnimatedCluster({
+    name: 'Cluster',
+    source: clusterSource,
+    animationDuration: 700,
+    // Cluster style
+    style: selectedStyle
+  });
+
+  map.addLayer(clusterAnimateLayer);
+  clusterAnimateLayer.setZIndex(4);
+  var vizTypeId = document.getElementsByClassName("pointSv active")[0].children[1].getAttribute('id');
+  if (vizTypeId == null) {
+    clusterAnimateLayer.setVisible(false);
+  }
+  else {
+    clusterLayer.setVisible(false);
+  }
+  
+  //Hide loading bus data message
+  $('#loadingBusData').hide();
+}
 
 function addBusFeaturesReasign(dataArr) {
   var featuresArr = [];
@@ -475,7 +568,28 @@ function addClipBusDataInteraction() {
 var busDataArr;
 var selectedGeofence;
 var selectInteraction;
-
+const styles = {
+  'icon': new ol.style.Style({
+    image: new ol.style.Circle({
+      radius: 7,
+      fill: new ol.style.Fill({color: "rgba(0,151,222,1.0)"}),
+      stroke: new ol.style.Stroke({
+        color: "rgba(0,151,222,0.5)",
+        width: 7,
+      }),
+    }),
+  }),
+  'geoMarker': new ol.style.Style({
+    image: new ol.style.Circle({
+      radius: 7,
+      fill: new ol.style.Fill({color: "rgba(0,151,222,1.0)"}),
+      stroke: new ol.style.Stroke({
+        color: "rgba(0,151,222,0.5)",
+        width: 12,
+      }),
+    }),
+  }),
+};
 function initSelectInteraction () {
   selectInteraction = new ol.interaction.Select({
     layers: [clusterLayer, stationLyr, clusterAnimateLayer]
@@ -518,8 +632,7 @@ function initSelectInteraction () {
           //$('#busToolTipBox').show();
           document.getElementById("imei_no").innerHTML = data['imei'];
           document.getElementById("avltm").innerHTML = new Date(data["avltm"]).toLocaleString();
-          document.getElementById("up_time").innerHTML = new Date(data["updatedon"]).toLocaleString();
-          document.getElementById("cr_time").innerHTML = new Date(data["createdon"]).toLocaleString();
+          //document.getElementById("up_time").innerHTML = new Date(data["updatedon"]).toLocaleString();
           document.getElementById("cr_time").innerHTML = new Date(data["createdon"]).toLocaleString();
           document.getElementById("ang").innerHTML = data['ang'];
           document.getElementById("speed").innerHTML = data['spd'];
@@ -702,9 +815,10 @@ function addGeofenceData(data) {
 }
 
 var geofenceDataArr = [];
-function getAllGeofence() {
+var geofenceDataAvailable = false;
+function getPreDataAllGeofence() {
   //show loader box  @khuram,waqas
-  $('#loadingGeofenceData').show();
+  //$('#loadingGeofenceData').show();
 
   $.ajax({
     url: "./data/get_geofence.php",
@@ -717,10 +831,11 @@ function getAllGeofence() {
       // console.log(data);
       //hide loader dialog box @khuram,waqas
       geofenceDataArr = data;
-      addGeofenceData(geofenceDataArr);
+      geofenceDataAvailable = true;
+      
+      $('#geofencesTable').show();
+      $('#geofencesTableLoading').hide();
 
-      //Hide Geofence Data message
-      $('#loadingGeofenceData').hide();
 
     },
     error: function (jqXHR, exception) {
@@ -747,6 +862,22 @@ function getAllGeofence() {
       // $('#toolTipBox').show();
     },
   });
+}
+
+function getAllGeofence() {
+  
+  //show loader box  @khuram,waqas
+  $('#loadingGeofenceData').show();
+  
+  if(geofenceDataAvailable){
+    addGeofenceData(geofenceDataArr);
+  }else{
+
+  }
+
+  //Hide Geofence Data message
+  $('#loadingGeofenceData').hide();
+
 }
 
 function exportAsGeoJson() {
@@ -786,10 +917,43 @@ function downloadJSON() {
   URL.revokeObjectURL(url);
 }
 
+var animationDataArr = [];
+function getDataForAnim(imei, sDate, eDate) {
+
+  console.log("imei no: " + imei + " Start Date: " + sDate + " End Date: " + eDate);
+  $('#animBar').hide();
+  $('#animBarLoading').show();
+
+  $.ajax({
+    url: "./data/get_animationData.php",
+    method: "POST",
+    dataType: "json",
+    data: {
+      api_key: "becdf4fbbbf49dbc",
+      imei_no: imei,
+      start_date: sDate,
+      end_date: eDate
+    },
+    success: function (response) {
+      //close laoder
+      animationDataArr = response;
+      addAnimateFeatures(animationDataArr);
+      $('#animBarLoading').hide();
+      $('#animBar').show();
+      console.log('animationDataArr:', animationDataArr);
+      //document.getElementsByClassName("animBarFill")[0].style.width= 0+"%";
+      document.getElementById("animationRangeSlider").value = 0.00;
+      // runFor100Seconds();
+    },
+    error: function (xhr, status, error) {
+      console.log('Error:', error);
+    }
+  });
 
 
+}
 
-//document.getElementById("draw_geofence").addEventListener("click", toggleDrawGeofenceCtrl);
+
 
 /*document.getElementById("bmap").onchange = function(){
          switchBaseMaps();
@@ -1067,20 +1231,30 @@ function unselectAllFeatures() {
 
 function geofenceSearchEvent(event, geofencesTable) {
   var value = document.getElementById(event).value;
+  console.log("value: " + value);
   if (value != null && value != '') {
     const myDiv = document.getElementById(geofencesTable);
     const inputElements = myDiv.querySelectorAll("tr");
+
+    //console.log("inputElements length: " + inputElements.length);
+    //console.log("inputElements: ", inputElements);
+
     for (i = 0; i < inputElements.length; ++i) {
       each = inputElements[i];
+
       if (each.id && each.id != '') {
         const myDiv = document.getElementById(each.id);
         const trInputs = myDiv.querySelectorAll("input");
+
         if (trInputs && trInputs.length) {
           for (j = 0; j < trInputs.length; ++j) {
             var element = trInputs[j].dataset;
+            //console.log("element: ", element);
             if (String(element.geofencename).includes(value) ||
-              String(element.english_name).includes(value) ||
-              String(element.arabic_name).includes(value)) {
+              String(element.arabicname).includes(value) ||
+              String(element.englishname).includes(value) ||
+              String(element.codeid).includes(value) ||
+              String(element.season).includes(value)) {
               var el = document.getElementById(each.id);
               if (el) {
                 el.classList.remove("d-none");
@@ -1233,6 +1407,51 @@ function filterGeofenceLayerData(filter_type, geofenceName) {
   addGeofenceData(filterGeofenceLayerArr);
 }
 
+var idGeofenceFiltered = [];
+function geofenceCheckBox (cb){
+  const idGeofence = cb.getAttribute('data-id');
+    
+  if (cb.checked) {
+    var geoDataFilter1 = geofenceDataArr.filter(function(data) {
+     return data._id.$oid == idGeofence;
+    });
+
+   
+
+    if(idGeofenceFiltered.length <= 0){
+      idGeofenceFiltered = geoDataFilter1;
+    }else{
+      var tem_arr = idGeofenceFiltered.concat(geoDataFilter1);
+      idGeofenceFiltered = tem_arr;
+    }
+
+    //console.log("Checked: " + idGeofence);
+    //console.log("idGeofenceFiltered length: " + idGeofenceFiltered.length);
+
+    addGeofenceData(idGeofenceFiltered);
+
+  }else{
+
+    var geoDataFilter2 = idGeofenceFiltered.filter(function(data) {
+      return data._id.$oid != idGeofence;
+    });
+
+    //console.log("Unchecked: " + idGeofence);
+    //console.log("geoDataFilter2 length: " + geoDataFilter2.length);
+
+    if(geoDataFilter2.length > 0){
+
+      idGeofenceFiltered = geoDataFilter2;
+      addGeofenceData(idGeofenceFiltered);
+
+    }else{
+      idGeofenceFiltered = [];
+      stationLyr.setVisible(false);
+    }
+  }
+}
+
+
 //filterGeofenceData(1,'Parking Allith Road - the coast'); call to search geofence on english name
 //filterGeofenceData(2,'موقف السيارات ربوة منى (صدقي)');  call to search geofence on arabic name
 $(document).ready(function () {
@@ -1240,9 +1459,13 @@ $(document).ready(function () {
   addDrawInteraction();
   addClipBusDataInteraction();
   // getAllGeofence();
+
   switchBaseMaps();
   getAllBusesData();
   //loadFiltersDataDevicesCompany();
+
+  getPreDataAllGeofence()
+
   $("#exportGeofence").click(function () {
     downloadJSON();
   });
@@ -1257,7 +1480,7 @@ $(document).ready(function () {
   document.getElementById("de_draw_geofence").addEventListener("click", toggleDrawGeofenceCtrl); //draw gerofence control listener
   document.getElementById("activeGeoAna").addEventListener("click", toggleClipBusDataCtrl); //draw gerofence control listener
   document.getElementById("deactive_bffdg").addEventListener("click", toggleClipBusDataCtrl); //draw gerofence control listener
-
+  // document.getElementById("palyBtn").addEventListener("click", runFor100Seconds);
 
   $("#applySettingBtn").click(function () {
     addBusFeatures(busDataArr);
@@ -1292,4 +1515,105 @@ function showGeofenceFilterBusesPopup(busesData){
     document.getElementById("busesFilterFromDrawGeofence_tbody_id").innerHTML = "";
   }
   tableSorterDataUpdate();
+}
+
+// Function to execute after 100 seconds
+function after100Seconds() {
+  console.log("100 seconds have passed!");
+  // sliderValue = 0;
+  // currentIndex = 0;
+  //document.getElementsByClassName("animBarFill")[0].style.width= sliderValue+"%";
+  document.getElementById("animationRangeSlider").value = sliderValue;
+  runFor100Seconds();
+  // Add your desired code here
+  // currentIndex =0;
+}
+
+// Delay function
+function delay(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+var play= true;
+var currentIndex =0;
+var sliderValue=0.0;
+var reset = false;
+// var stop = false;
+// Run for 100 seconds
+async function runFor100Seconds() {
+  // play =!play;
+  // stop = false;
+  // play = true;
+  // currentIndex = val;
+  if (animationDataArr != undefined)
+    currentIndex = (animationDataArr.length * sliderValue) / 100;
+  else
+    currentIndex = 0;
+
+  if (currentIndex>=animationDataArr.length)
+    currentIndex = 0;
+  
+  for (let i = currentIndex; i < animationDataArr.length; i++) {
+    //console.log("Time elapsed:", (i + 1), "second(s)");
+    if (animationDataArr == undefined)
+        break;
+    if (!play) {
+      sliderValue = (i/animationDataArr.length)*100;
+      break;
+    }
+    if (reset) {
+      reset = false;
+      break;
+    }
+    var percentBar = i+1;
+    currentIndex =i;
+    sliderValue = (i/animationDataArr.length)*100;
+    console.log("animation slider value:  " + sliderValue+"%");
+    //change this line for animation slider
+    //document.getElementsByClassName("animBarFill")[0].style.width= sliderValue+"%";
+
+    document.getElementById("animationRangeSlider").value = sliderValue;
+    
+    sliceBusDataArr = animationDataArr.slice(i,i+1);
+    addAnimateFeatures(sliceBusDataArr);
+    var imeiText = document.getElementById('totalTime');
+    var timeText = document.getElementById('consumeTime');
+    imeiText.textContent = sliceBusDataArr[0].imei+':IMEI';
+    timeText.textContent = new Date(sliceBusDataArr[0].avltm).toLocaleDateString("en-GB") + ' ' +new Date(sliceBusDataArr[0].avltm).toLocaleTimeString("default");
+    var lt = parseInt(i);
+    if (lt == 0)
+      map.getView().fit(busesDataSource.getExtent(), {size:map.getSize(), maxZoom:8});
+    else if (lt % 100 == 0)
+      map.getView().fit(busesDataSource.getExtent(), {size:map.getSize(), maxZoom:map.getView().getZoom()});
+    await delay(speed); // Delay for 1 second (1000 milliseconds)
+  }
+  if (currentIndex+1 == animationDataArr.length) {
+    currentIndex = 0;
+    sliderValue = 0;
+  }
+  if (play)
+    after100Seconds();
+  // after100Seconds(); // Call the function after 100 seconds
+}
+
+
+// animation slider function
+function animationSliderVal(rangeVal) {
+  // stop = true;
+  // play = false;
+  sliderValue = rangeVal;
+  //document.getElementsByClassName("animBarFill")[0].style.width= sliderValue+"%";
+  document.getElementById("animationRangeSlider").value = sliderValue;
+  console.log("animation slider value while sliding:  " + sliderValue);
+      $('#palyBtn').removeClass("active");
+      $('#playbtnIcon').show();
+      $('#pausebtnIcon').hide();
+      animationState(false);
+  // runFor100Seconds(100-rangeVal);
+}
+
+// animation state function
+function animationState(val) {
+  play = val;
+  if (play)
+    runFor100Seconds();
 }

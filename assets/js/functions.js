@@ -107,6 +107,20 @@ $( document ).ready(function() {
       $('#editGeofenceDetails').hide();
   });
 
+  $("#palyBtn").click(function() { 
+    if($(this).hasClass("active")){
+      $(this).removeClass("active");
+      $('#playbtnIcon').show();
+      $('#pausebtnIcon').hide();
+      animationState(false);
+    }else{
+      $(this).addClass("active");
+      $('#playbtnIcon').hide();
+      $('#pausebtnIcon').show();
+      animationState(true);
+    }
+  });
+
   $(".nClose").click(function() { 
       $('.notification').animate({top:"0px",opacity:"0.1"}, function(){
       $('.notification').hide();
@@ -172,8 +186,121 @@ $( document ).ready(function() {
     $("#fullScreenOn").show();
   });
 
+  $("button.actionBtn").click(function(){
+    $(".moreAction").hide();
+    $(this).children(".moreAction").show();
+    //console.log("button.actionBtn");
+  });
+
+
+  //Amination slider value update
+  var animSlider = document.getElementById("animationRangeSlider");
+  //var output = document.getElementById("demo");
+  //output.innerHTML = slider.value; // Display the default slider value
+
+  // Update the current slider value (each time you drag the slider handle)
+  animSlider.oninput = function() {
+    //output.innerHTML = this.value;
+    animationSliderVal(this.value);
+  }
 
 });
+var getImeiNo;
+
+function animationImei(cb) {
+  const imeiNo = cb.getAttribute('data-imei');
+  getImeiNo = imeiNo;
+  showDateRange();
+
+  //console.log("this is: " + imeiNo);
+}
+
+$(function() {
+  $('#dateRangeImei').daterangepicker({
+    opens: 'right',
+    locale: {
+        applyLabel: 'Apply Date Range',
+        format: "DD/MM/YYYY"
+    }
+  }, function(start, end, label) {
+    closeDateRange();
+    $(".moreAction").hide();
+    $("#animationRestoreBtn").hide();
+
+    $(".busFinder>a").removeClass("active");
+    $('#busFinderBox').hide();
+
+    $(".animationPanel").show();
+    $("#startDateRange").html(start.format('D MMMM, YYYY'));
+    $("#endDateRange").html(end.format('D MMMM, YYYY'));
+
+    getDataForAnim(getImeiNo, start.format('DD-MM-YYYY'), end.format('DD-MM-YYYY'));
+    console.log("this getImeiNo: " + getImeiNo);
+  });
+});
+
+function closeAnimationPanel() {
+  $(".animationPanel").hide();
+  currentIndex=0;
+  sliderValue=0;
+  reset = true;
+  $('#palyBtn').removeClass("active");
+  $('#playbtnIcon').show();
+  $('#pausebtnIcon').hide();
+  animationState(false);
+  animationDataArr=undefined;
+  addBusFeatures(busDataArr);
+}
+function hideAnimationPanel() {
+  $(".animationPanel").hide();
+  $("#animationRestoreBtn").show();
+}
+function showAnimationPanel() {
+  $(".animationPanel").show();
+  $("#animationRestoreBtn").hide();
+}
+
+function closeDateRange() {
+  $("#datePickerWrapper").hide();
+}
+function showDateRange(){
+  $("#datePickerWrapper").show();
+  $('#dateRangeImei').focus();
+  $('.daterangepicker .drp-buttons .btn.btn-primary').prop('disabled', true);
+}
+
+function changeDataPanel() {
+  closeAnimationPanel();
+  showDateRange();
+  console.log("close panel");
+}
+
+function resetAnimation() {
+  sliderValue = 0;
+  currentIndex = 0;
+  reset = true;
+  //document.getElementsByClassName("animBarFill")[0].style.width= sliderValue+"%";
+  document.getElementById("animationRangeSlider").value = sliderValue;
+    
+}
+
+var speed = 100;
+var speedState = 0;
+
+function setSpeed() {
+  if (speedState == 0) {
+    speed = 1000;
+    speedState++;
+  }
+  else if (speedState == 1) {
+    speed = 100;
+    speedState++;
+  }
+  else if (speedState == 2) {
+    speed = 10;
+    speedState=0;
+  }
+}
 
 function tableSorterDataUpdate() {
   $("#busesFilterFromDrawGeofenceTable").trigger("update");

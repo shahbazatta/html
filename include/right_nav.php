@@ -192,20 +192,24 @@
                           </td>
                           <td>".$plate_no."</td>
                           <td>".$output['device']['bus_oper_no']."</td>
-                          <td><button type='button' class='actionBtn'><img src='assets/images/icons/more.svg'></button></td>
+                          <td><button type='button' class='actionBtn'><img src='assets/images/icons/more.svg'>
+                              <div class='moreAction'>
+                                <div class='icon_anim' onclick='animationImei(this)' data-imei = '".(int)$output['imei']."'>Animation</div>
+                              </div>
+                          </button></td>
                         </tr>";
                   if ($count == 100) {
-                    //break;
+                    break;
                   }
                 }
               ?>
             </tbody>
           </table>
-
         </div>
       </div>
-      
     </div>
+    
+
 
     <div class="geofences">
       <a href="javascript:void(0)"><img src="assets/images/icons/routing.png"></a>
@@ -218,6 +222,7 @@
 
         <!--Companies list-->
         <div class="mainListRows newScrollBar">
+          <div id="geofencesTableLoading">Loading Geofence Data...</div>
           <table id="geofencesTable" class="tableNeo tablesorter">
             <thead>
               <tr>
@@ -241,8 +246,10 @@
                     echo "<tr id='geofence".$output['_id']."'>
                           <td>
                             <label class='cCheckBox2'>
-                              <input type='checkbox' id='".$output['_id']."' data-geofenceName='".$output['attributes']['Description']."' data-ArabicName='".$output['attributes']['ArabicName']."' data-EnglishName='".$output['attributes']['EnglishName']."' 
-                               name='".$output['_id']."' value='".$output['_id']."'>
+                              <input type='checkbox' id='".$output['_id']."' data-id='".$output['_id']."' data-geofenceName='".$output['attributes']['Description']."' data-ArabicName='".$output['attributes']['ArabicName']."' data-EnglishName='".$output['attributes']['EnglishName']."' 
+                                data-CodeId='".$output['attributes']['Code_ID']."' 
+                                data-Season='".$output['attributes']['Season']."' 
+                               name='".$output['_id']."' value='".$output['_id']."' onclick='geofenceCheckBox(this)'>
                               <span class='checkmark'></span>
                             </label>
                             ".$name."
@@ -362,3 +369,55 @@
     <div class="logout"><a href="login.php?logout"><img src="assets/images/icons/exit.svg"></a></div>
   </nav>
 </div>
+
+<div class="datePickerWrapper" id="datePickerWrapper">
+  <div class="datePickerBox">
+    <div class="head">Select Date Range</div>
+    <input type="text" id="dateRangeImei" name="dateRangeImei" value="" />
+    <div class="close" onclick="closeDateRange()"><img src="assets/images/icons/close.svg"></div>
+  </div>
+</div>
+
+
+<div class="animationPanel" id="animationPanel">
+  
+  <div class="animHeader">
+    <div class="date">
+      <div class="dateRangeShow" onclick="changeDataPanel()">
+        <span id="startDateRange"></span> - <span id="endDateRange"></span>
+        <br>
+        <span class="selectDaterange">Select Date Range</span>
+      </div>
+    </div>
+
+    <button type="button" class="closeBtn" id="closeBtn" onclick="closeAnimationPanel()"><img src="assets/images/icons/close.png"> Close</button>
+    <button type="button" class="hideBtn" id="hideBtn" onclick="hideAnimationPanel()"><img src="assets/images/icons/screenmirroring.png"> Hide</button>
+  </div>
+
+  <div class="animBody">
+    
+    <div class="animBar" id="animBar">
+      <span class="animBarFill">
+        <input type="range" min="0.00" max="100.00" value="0" step="0.01" class="animation-slider" id="animationRangeSlider">
+      </span>
+    </div>
+
+    <div class="animBarLoading" id="animBarLoading">
+      <img src="assets/images/icons/loading.gif">
+    </div>
+
+  </div>
+
+  <div class="animControl">
+    <button type="button" class="speedBtn" id="speedBtn" onclick="setSpeed()"><img src="assets/images/icons/speedometer.png"> Speed</button>
+    <button type="button" class="palyBtn" id="palyBtn">
+      <span id="consumeTime">00:00:00</span> 
+      <img id="playbtnIcon" src="assets/images/icons/play.png"> 
+      <img id="pausebtnIcon" src="assets/images/icons/pause.png"> 
+      <span id="totalTime">00:00:00</span>
+    </button>
+    <button type="button" class="resetBtn" id="resetBtn" onclick="resetAnimation()"><img src="assets/images/icons/refresh.png"> Reset</button>
+  </div>
+
+</div>
+<button type="button" class="animationRestoreBtn" id="animationRestoreBtn" onclick="showAnimationPanel()"><img src="assets/images/icons/animation16.png"> Animation Restore</button>
