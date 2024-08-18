@@ -176,11 +176,11 @@
                   //print_r($output);
                   $count ++;
                   if ($lang_type == 'ar'){
-                    $plate_no = $output['device']['plate_no'];
+                    $plate_no = $output['plate_no'];
                   }
                   else{
                     //$plate_no = $output['device']['engplate_no'];
-                    $plate_no = $output['device']['plate_no'];
+                    $plate_no = $output['plate_no'];
                   }
                   echo "<tr id='".(int)$output['imei']."'>
                           <td>
@@ -191,7 +191,7 @@
                             ".(int)$output['imei']."
                           </td>
                           <td>".$plate_no."</td>
-                          <td>".$output['device']['bus_oper_no']."</td>
+                          <td>".$output['bus_oper_no']."</td>
                           <td><button type='button' class='actionBtn'><img src='assets/images/icons/more.svg'>
                               <div class='moreAction'>
                                 <div class='icon_anim' onclick='animationImei(this)' data-imei = '".(int)$output['imei']."'>Animation</div>
